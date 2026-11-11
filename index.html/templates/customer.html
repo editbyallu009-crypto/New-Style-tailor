@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ c.name }}</h1>
+<div class="card">
+  <dl class="kv">
+    <dt>Mobile</dt><dd>{{ c.phone }}</dd>
+    <dt>Pata</dt><dd>{{ c.address or '-' }}</dd>
+    <dt>Customer since</dt><dd>{{ c.created_at or '-' }}</dd>
+    <dt>Total baaki</dt><dd><b>₹{{ balance }}</b></dd>
+  </dl>
+</div>
+
+{% if latest %}
+<h2>Pichhla naap</h2>
+<div class="two">
+  {% for item, rows in latest.items() %}
+  <div class="card"><b>{{ item }}</b>
+    <dl class="kv">{% for label, v in rows %}<dt>{{ label }}</dt><dd>{{ v }}</dd>{% endfor %}</dl>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<h2>Saare orders</h2>
+<div class="card tablewrap">
+<table>
+  <tr><th>ID</th><th>Date</th><th>Item</th><th>Price</th><th>Baaki</th><th>Status</th><th></th></tr>
+  {% for o in orders %}
+  <tr>
+    <td>#{{ o.order_id }}</td><td>{{ o.order_date }}</td><td>{{ o.item_type }}</td>
+    <td>₹{{ o.total_price }}</td><td>₹{{ o.total_price - o.advance_paid }}</td>
+    <td><span class="badge s-{{ o.status }}">{{ o.status }}</span></td>
+    <td><a class="btn small" href="{{ url_for('order_detail', oid=o.order_id) }}">Kholo</a></td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+{% endblock %}

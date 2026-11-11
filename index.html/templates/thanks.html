@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card center">
+  <h1>Order mil gaya! 🎉</h1>
+  <p class="muted">Aapka Order ID</p>
+  <div class="big">#{{ last.id }}</div>
+  {% if last.total > 0 %}<p>Silai price: <b>₹{{ last.total }}</b></p>{% endif %}
+  <p class="muted">Is Order ID ka screenshot le lein. Dukaan par dikhane ke liye kaam aayega.</p>
+  <a class="btn" href="{{ url_for('order_form') }}" style="margin-top:10px">Ek aur order</a>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Naya Order / New Order</h1>
+<p class="muted">Apni detail bharein. Silai ka price neeche apne aap dikhega.</p>
+<form method="post" enctype="multipart/form-data" class="card">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+
+  <h2>1. Aapki detail</h2>
+  <label>Naam / Name *
+    <input name="name" required maxlength="100" value="{{ form.get('name','') }}"></label>
+  <label>Mobile number *
+    <input name="phone" type="tel" inputmode="numeric" required maxlength="15" value="{{ form.get('phone','') }}"></label>
+  <label>Pata / Address (zaroori nahi)
+    <input name="address" maxlength="255" value="{{ form.get('address','') }}"></label>
+
+  <h2>2. Kya silwana hai?</h2>
+  <label>Item *
+    <select name="item_type" id="item" required>
+      <option value="">-- chuniye --</option>
+      {% for i in items %}
+      <option value="{{ i.item_type }}" {% if form.get('item_type') == i.item_type %}selected{% endif %}>{{ i.item_type }}</option>
+      {% endfor %}
+    </select></label>
+  {% if extras %}
+  <p class="muted" style="margin-bottom:0">Extra (agar chahiye):</p>
+  <div class="checks">
+    {% for e in extras %}
+    <label class="check"><input type="checkbox" name="extras" value="{{ e.extra_name }}" {% if e.extra_name in form_extras %}checked{% endif %}>
+      {{ e.extra_name }}{% if e.extra_price %} (+₹{{ e.extra_price }}){% endif %}</label>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <h2>3. Naap / Measurements (inch mein)</h2>
+  <p class="muted">Pata na ho to khali chhod dein, dukaan par naap le liya jayega.</p>
+  <div class="grid2">
+    {% for key, label in meas %}
+    <label>{{ label }}
+      <input name="m_{{ key }}" type="number" step="0.25" min="0" max="199" inputmode="decimal" value="{{ form.get('m_' + key, '') }}"></label>
+    {% endfor %}
+  </div>
+
+  <h2>4. Design</h2>
+  <label>Design ki photo (gallery ya camera se)
+    <input type="file" name="design" accept="image/*"></label>
+  <label>Special baat / Notes
+    <textarea name="notes" rows="3" maxlength="1000" placeholder="Jaise: collar slim, pocket do chahiye...">{{ form.get('notes','') }}</textarea></label>
+
+  <div class="pricebar"><span>Silai price</span><strong id="total">—</strong></div>
+  <button class="btn" type="submit">Order bhejein</button>
+</form>
+
+<script>
+const itemPrices = {{ item_prices|tojson }};
+const extraPrices = {{ extra_prices|tojson }};
+function calc() {
+  let t = itemPrices[document.getElementById('item').value] || 0;
+  document.querySelectorAll('input[name=extras]:checked').forEach(c => t += extraPrices[c.value] || 0);
+  document.getElementById('total').textContent = t > 0 ? '₹' + t : 'Dukaan par bataya jayega';
+}
+document.getElementById('item').addEventListener('change', calc);
+document.querySelectorAll('input[name=extras]').forEach(c => c.addEventListener('change', calc));
+calc();
+</script>
+{% endblock %}

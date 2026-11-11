@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Order #{{ o.order_id }} <span class="badge s-{{ o.status }}">{{ o.status }}</span></h1>
+<div class="two">
+  <div>
+    <div class="card">
+      <h2 style="margin-top:0">Customer</h2>
+      <dl class="kv">
+        <dt>Naam</dt><dd><a href="{{ url_for('customer_page', cid=o.customer_id) }}">{{ o.name }}</a></dd>
+        <dt>Mobile</dt><dd>{{ o.phone }}</dd>
+        <dt>Pata</dt><dd>{{ o.address or '-' }}</dd>
+        <dt>Order date</dt><dd>{{ o.order_date }}</dd>
+        <dt>Item</dt><dd>{{ o.item_type }}</dd>
+        <dt>Extra</dt><dd>{{ o.extras or '-' }}</dd>
+        <dt>Notes</dt><dd>{{ o.notes or '-' }}</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">Naap (inch)</h2>
+      {% if meas %}
+      <dl class="kv">{% for label, v in meas %}<dt>{{ label }}</dt><dd>{{ v }}</dd>{% endfor %}</dl>
+      {% else %}<p class="muted">Customer ne naap nahi diya.</p>{% endif %}
+    </div>
+    {% if o.design_photo %}
+    <div class="card"><h2 style="margin-top:0">Design</h2>
+      <img class="photo" src="{{ url_for('uploads', name=o.design_photo) }}" alt="Design photo"></div>
+    {% endif %}
+  </div>
+
+  <div>
+    <div class="card">
+      <h2 style="margin-top:0">Bill</h2>
+      <dl class="kv">
+        <dt>Silai</dt><dd>₹{{ o.base_price }}</dd>
+        <dt>Extra</dt><dd>₹{{ o.extras_price }}</dd>
+        <dt><b>Total</b></dt><dd><b>₹{{ o.total_price }}</b></dd>
+        <dt>Advance mila</dt><dd>₹{{ o.advance_paid }}</dd>
+        <dt><b>Baaki</b></dt><dd><b>₹{{ o.total_price - o.advance_paid }}</b></dd>
+        <dt>Delivery</dt><dd>{{ o.delivery_date or 'tay nahi' }}</dd>
+      </dl>
+    </div>
+
+    <form method="post" action="{{ url_for('order_update', oid=o.order_id) }}" class="card no-print">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <h2 style="margin-top:0">Update karein</h2>
+      <label>Status
+        <select name="status">{% for s in statuses %}<option {% if s == o.status %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></label>
+      <label>Delivery date
+        <input type="date" name="delivery_date" value="{{ o.delivery_date or '' }}"></label>
+      <label>Total price (badalna ho to)
+        <input type="number" name="total_price" min="0" value="{{ o.total_price }}"></label>
+      <label>Naya payment mila (₹)
+        <input type="number" name="add_payment" min="0" placeholder="0"></label>
+      <button class="btn" type="submit">Save</button>
+    </form>
+
+    <div class="card no-print">
+      <a class="btn green" style="display:block" href="{{ wa }}" target="_blank" rel="noopener">WhatsApp message bhejein</a>
+      <button class="btn gray" style="margin-top:10px" type="button" onclick="window.print()">Bill print karein</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

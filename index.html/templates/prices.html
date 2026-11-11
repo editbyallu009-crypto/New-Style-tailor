@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Silai Price List</h1>
+<p class="muted">Yahan se apne rates badlein. Naya rate sirf aane wale orders par lagega, purane orders nahi badlenge.</p>
+
+{% for kind, title, rows, namekey, pricekey in [('items', 'Item ki silai', items, 'item_type', 'base_price'), ('extras', 'Extra charges', extras, 'extra_name', 'extra_price')] %}
+<h2>{{ title }}</h2>
+<div class="card">
+  {% for r in rows %}
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+    <form class="row-form" method="post" action="{{ url_for('prices_save') }}" style="flex:1;min-width:230px">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <input type="hidden" name="kind" value="{{ kind }}">
+      <input type="hidden" name="name" value="{{ r[namekey] }}">
+      <span style="flex:1;min-width:110px"><b>{{ r[namekey] }}</b></span>
+      <span>₹</span>
+      <input type="number" name="price" min="0" value="{{ r[pricekey] }}" style="width:100px">
+      <button class="btn small" type="submit">Save</button>
+    </form>
+    <form class="row-form" method="post" action="{{ url_for('prices_delete') }}" onsubmit="return confirm('Hata dein?')">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <input type="hidden" name="kind" value="{{ kind }}">
+      <input type="hidden" name="name" value="{{ r[namekey] }}">
+      <button class="btn small red" type="submit">Hatao</button>
+    </form>
+  </div>
+  {% endfor %}
+  <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+  <form class="row-form" method="post" action="{{ url_for('prices_save') }}" style="flex-wrap:wrap">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="kind" value="{{ kind }}">
+    <input name="name" placeholder="Naya naam" maxlength="50" required style="flex:1;min-width:140px">
+    <input type="number" name="price" min="0" placeholder="₹ price" required style="width:110px">
+    <button class="btn small" type="submit">Jodein</button>
+  </form>
+</div>
+{% endfor %}
+{% endblock %}

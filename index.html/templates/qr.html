@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Shop ka QR Code</h1>
+<div class="card center">
+  {% if local %}
+  <div class="warn" style="text-align:left">Ye link sirf is computer par chalega. Customer ke phone ke liye neeche laptop ka IP wala link daalein
+    (jaise <code>http://192.168.1.5:5000/order</code>). README mein dekhein.</div>
+  {% endif %}
+  <img class="qrimg" src="{{ url_for('qr_png', url=url) }}" alt="QR code">
+  <p><b>Scan karke order karein</b></p>
+  <p class="muted" style="word-break:break-all">{{ url }}</p>
+  <button class="btn gray" style="max-width:260px" type="button" onclick="window.print()">QR print karein</button>
+</div>
+<form method="get" class="card no-print">
+  <label>QR ka link badlein
+    <input name="url" value="{{ url }}" maxlength="300"></label>
+  <button class="btn" type="submit">QR banao</button>
+</form>
+{% endblock %}

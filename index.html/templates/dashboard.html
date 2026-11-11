@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Orders</h1>
+{% if unpriced %}
+<div class="warn">{{ unpriced }} item ka silai price 0 hai. <a href="{{ url_for('prices') }}">Price set karein</a></div>
+{% endif %}
+
+<div class="stats">
+  {% for s in statuses %}
+  <a class="stat" href="{{ url_for('dashboard', status=s) }}" style="text-decoration:none;color:inherit"><b>{{ counts.get(s, 0) }}</b><span>{{ s }}</span></a>
+  {% endfor %}
+  <div class="stat"><b>{{ late }}</b><span>Delivery due</span></div>
+  <div class="stat"><b>₹{{ due }}</b><span>Total baaki</span></div>
+</div>
+
+<form class="searchbar" method="get">
+  <input name="q" value="{{ q }}" placeholder="Naam, mobile ya Order ID se dhundhein">
+  <select name="status">
+    <option value="">Sab status</option>
+    {% for s in statuses %}<option {% if s == status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+  </select>
+  <button class="btn small" type="submit">Dhundho</button>
+</form>
+
+<div class="card tablewrap">
+{% if orders %}
+<table>
+  <tr><th>ID</th><th>Customer</th><th>Item</th><th>Price</th><th>Baaki</th><th>Status</th><th>Delivery</th><th></th></tr>
+  {% for o in orders %}
+  <tr>
+    <td>#{{ o.order_id }}</td>
+    <td><a href="{{ url_for('customer_page', cid=o.customer_id) }}">{{ o.name }}</a><br><span class="muted">{{ o.phone }}</span></td>
+    <td>{{ o.item_type }}</td>
+    <td>₹{{ o.total_price }}</td>
+    <td>₹{{ o.total_price - o.advance_paid }}</td>
+    <td><span class="badge s-{{ o.status }}">{{ o.status }}</span></td>
+    <td>{{ o.delivery_date or '-' }}</td>
+    <td><a class="btn small" href="{{ url_for('order_detail', oid=o.order_id) }}">Kholo</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="muted">Abhi koi order nahi hai. QR page se QR print karke counter par lagayein.</p>
+{% endif %}
+</div>
+{% endblock %}
